@@ -1,13 +1,13 @@
-package composite
+package fcomposite
 
 import(
     "github.com/ricallinson/forgery"
 )
 
-type Map map[string]func(*Request, *Response, func())
+type Map map[string]func(*f.Request, *f.Response, func())
 
 /*
-    cfg := composite.Map{
+    composite := fcomposite.Map{
         "header": func(req, res, next) {
             res.End("Header string")
         },
@@ -19,8 +19,11 @@ type Map map[string]func(*Request, *Response, func())
         },
     }
 
-    data := cfg.Dispatch(req, res, next)
+    data := composite.Dispatch(req, res, next)
 */
-func (this *Map) Dispatch(req *forgery.Request, res *forgery.Response, next func()) (map[string]string) {
+func (this *Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[string]string) {
+
     // Replace res.Writer with something to buffer the data.
+
+    return map[string]string{}
 }
