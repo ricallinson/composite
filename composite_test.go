@@ -33,6 +33,8 @@ func TestFcomposite(t *testing.T) {
             Charset: "utf-8",
             Locals: map[string]string{},
         }
+        res.SetApplication(&f.Server{})
+        res.SetRequest(req)
     })
 
     Describe("Dispatch()", func() {
@@ -40,20 +42,21 @@ func TestFcomposite(t *testing.T) {
         It("should return", func() {
 
             composite := Map{
-                // "header": func(req *f.Request, res *f.Response, next func()) {
-                //     res.Send("Header string")
-                // },
-                // "body": func(req *f.Request, res *f.Response, next func()) {
-                //     res.Render("page.html", "Body string")
-                // },
+                "header": func(req *f.Request, res *f.Response, next func()) {
+                    res.Send("Header")
+                },
+                "empty": func(req *f.Request, res *f.Response, next func()) {
+                    // res.Render("page.html")
+                    res.End("")
+                },
                 "footer": func(req *f.Request, res *f.Response, next func()) {
-                    res.End("Footer string")
+                    res.End("Footer")
                 },
                 "tail": func(req *f.Request, res *f.Response, next func()) {
-                    res.Write("Tail string")
+                    res.Write("Tail")
                 },
                 "close": func(req *f.Request, res *f.Response, next func()) {
-                    res.WriteBytes([]byte("Close string"))
+                    res.WriteBytes([]byte("Close"))
                 },
             }
 
@@ -61,7 +64,11 @@ func TestFcomposite(t *testing.T) {
 
             data := composite.Dispatch(req, res, fn)
 
-            AssertEqual(data, true)
+            AssertEqual(string(data["header"]), "Header")
+            AssertEqual(string(data["empty"]), "")
+            AssertEqual(string(data["footer"]), "Footer")
+            AssertEqual(string(data["tail"]), "Tail")
+            AssertEqual(string(data["close"]), "Close")
         })
     })
 

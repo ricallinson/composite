@@ -88,7 +88,9 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
         // Call the function.
         fn(req, res, next)
         // Add the buffered data to the done map.
-        done[id] = buffer.Buffer.Bytes()
+        if buffer.Buffer != nil {
+            done[id] = buffer.Buffer.Bytes()
+        }
     }
 
     // Put the res.Writer back.
