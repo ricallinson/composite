@@ -34,3 +34,13 @@ func (this *MockResponseWriter) WriteHeader(code int) {
 func NewMockResponseWriter(error bool) (*MockResponseWriter) {
     return &MockResponseWriter{error: error, headers: make(http.Header)}
 }
+
+/*
+    Create mock renderer.
+*/
+
+type MockRenderer struct {}
+
+func (this *MockRenderer) Render(f string, o ...interface{}) (string, error) {
+    return o[0].(string), nil
+}
