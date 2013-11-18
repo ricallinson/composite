@@ -89,7 +89,7 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
             // Create a buffer.
             buffer := &BufferedResponseWriter{}
             // Replace res.Writer with BufferedResponseWriter so all the output can be captured.
-            response.Response.Writer = buffer
+            response.Writer = buffer
             // Call the function.
             mapFn(req, response, next)
             // Add the buffered data to the renders map.
