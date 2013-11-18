@@ -84,7 +84,7 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
     for id, fn := range this {
         go func(mapId string, mapFn func(*f.Request, *f.Response, func())) {
             // Clone the res so it can be changed in isolation.
-            response := res.Clone(req)
+            response := res.Clone()
             // Create a buffer.
             buffer := &BufferedResponseWriter{}
             // Replace res.Writer with BufferedResponseWriter so all the output can be captured.
