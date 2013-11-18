@@ -73,9 +73,9 @@ type Map map[string]func(*f.Request, *f.Response, func())
 /*
     The worker.
 */
-func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[string][]byte) {
+func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[string]string) {
 
-    done := map[string][]byte{}
+    done := map[string]string{}
 
     // Grab the res.Writer so we can put it back later.
     w := res.Response.Writer
@@ -89,7 +89,7 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
         fn(req, res, next)
         // Add the buffered data to the done map.
         if buffer.Buffer != nil {
-            done[id] = buffer.Buffer.Bytes()
+            done[id] = buffer.Buffer.String()
         }
     }
 
