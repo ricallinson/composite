@@ -80,18 +80,29 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
     // Grab the res.Writer so we can put it back later.
     w := res.Response.Writer
 
+    c := make(chan int, len(this))
     for id, fn := range this {
-        // Create a buffer.
-        buffer := &BufferedResponseWriter{}
-        // Replace res.Writer with BufferedResponseWriter so all the output can be captured.
-        res.Response.Writer = buffer
-        // Call the function.
-        fn(req, res, next)
-        // Add the buffered data to the done map.
-        if buffer.Buffer != nil {
-            done[id] = buffer.Buffer.String()
-        }
+        go func(mapId string, mapFn func(*f.Request, *f.Response, func())) {
+            // Clone the res so it can be changed in isolation.
+            response := res.Clone(req)
+            // Create a buffer.
+            buffer := &BufferedResponseWriter{}
+            // Replace res.Writer with BufferedResponseWriter so all the output can be captured.
+            response.Response.Writer = buffer
+            // Call the function.
+            mapFn(req, response, next)
+            // Add the buffered data to the done map.
+            if buffer.Buffer != nil {
+                done[mapId] = buffer.Buffer.String()
+            }
+            // TODO: Transfer headers to the real Response
+            // ...
+            // Return the channel
+            c <- 1
+        }(id, fn)
     }
+    // Wait for all the channels to close.
+    <-c
 
     // Put the res.Writer back.
     res.Response.Writer = w
