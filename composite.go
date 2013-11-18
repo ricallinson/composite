@@ -109,7 +109,14 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
     res.Response.Writer = w
 
     // Write the headers to the real response.
-    // TODO
+    // Note, only the first value is transfered from the given http.Header map.
+    // Note, no ordering is guaranteed so headers could be overridden randomly.
+    for _, mapHeaders := range headers {
+        for f, v := range mapHeaders {
+            // res.Writer.Header()[f] = v
+            res.Set(f, v[0])
+        }
+    }
 
     return renders
 }
