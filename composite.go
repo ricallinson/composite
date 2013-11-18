@@ -75,7 +75,8 @@ type Map map[string]func(*f.Request, *f.Response, func())
 */
 func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[string]string) {
 
-    done := map[string]string{}
+    headers := map[string]http.Header{}
+    renders := map[string]string{}
 
     // Grab the res.Writer so we can put it back later.
     w := res.Response.Writer
@@ -91,12 +92,12 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
             response.Response.Writer = buffer
             // Call the function.
             mapFn(req, response, next)
-            // Add the buffered data to the done map.
+            // Add the buffered data to the renders map.
             if buffer.Buffer != nil {
-                done[mapId] = buffer.Buffer.String()
+                renders[mapId] = buffer.Buffer.String()
             }
-            // TODO: Transfer headers to the real Response
-            // ...
+            // Add the buffered headers to the headers map.
+            headers[mapId] = buffer.Headers
             // Return the channel
             c <- 1
         }(id, fn)
@@ -107,5 +108,8 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
     // Put the res.Writer back.
     res.Response.Writer = w
 
-    return done
+    // Write the headers to the real response.
+    // TODO
+
+    return renders
 }
