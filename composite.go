@@ -82,7 +82,9 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
     w := res.Response.Writer
 
     c := make(chan int, len(this))
+    // Loop over the items in the map.
     for id, fn := range this {
+        // Dispatch function.
         go func(mapId string, mapFn func(*f.Request, *f.Response, func())) {
             // Clone the res so it can be changed in isolation.
             response := res.Clone()
