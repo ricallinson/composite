@@ -66,6 +66,7 @@ type Map map[string]func(*f.Request, *f.Response, func())
 func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[string]string) {
 
     headers := map[string]http.Header{}
+    locals := map[string]map[string]string{}
     renders := map[string]string{}
 
     // Grab the res.Writer so we can put it back later.
@@ -88,8 +89,10 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
             if buffer.Buffer != nil {
                 renders[mapId] = buffer.Buffer.String()
             }
-            // Add the buffered headers to the headers map.
+            // Add the buffered Headers to the headers map.
             headers[mapId] = buffer.Headers
+            // Add the buffered Locals to the locals map.
+            locals[mapId] = response.Locals
             // Return the channel
             c <- 1
         }(id, fn)
@@ -108,6 +111,14 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) (map[stri
         for f, v := range mapHeaders {
             // res.Writer.Header()[f] = v
             res.Set(f, v[0])
+        }
+    }
+
+    // Write the Locals to the real response.
+    // Note, no ordering is guaranteed so Locals could be overridden randomly.
+    for _, mapLocals := range locals {
+        for f, v := range mapLocals {
+            res.Locals[f] = v
         }
     }
 

@@ -42,7 +42,7 @@ func TestFcomposite(t *testing.T) {
 
     Describe("Dispatch()", func() {
 
-        It("should return", func() {
+        It("should return win", func() {
 
             composite := Map{
                 "header": func(req *f.Request, res *f.Response, next func()) {
@@ -52,6 +52,7 @@ func TestFcomposite(t *testing.T) {
                     res.End("")
                 },
                 "body": func(req *f.Request, res *f.Response, next func()) {
+                    res.Locals["title"] = "Foo"
                     res.Render("test.html", "Body")
                 },
                 "footer": func(req *f.Request, res *f.Response, next func()) {
@@ -74,6 +75,7 @@ func TestFcomposite(t *testing.T) {
             AssertEqual(string(data["header"]), "Header")
             AssertEqual(string(data["empty"]), "")
             AssertEqual(string(data["body"]), "Body")
+            AssertEqual(res.Locals["title"], "Foo")
             AssertEqual(string(data["footer"]), "Footer")
             AssertEqual(string(data["tail"]), "Tail")
             AssertEqual(string(data["close"]), "Close")
