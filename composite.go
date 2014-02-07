@@ -72,11 +72,11 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) map[strin
 	// Grab the res.Writer so we can put it back later.
 	w := res.Response.Writer
 
-	c := make(chan int, len(this))
+	// c := make(chan int, len(this))
 	// Loop over the items in the map.
 	for id, fn := range this {
 		// Dispatch function.
-		go func(mapId string, mapFn func(*f.Request, *f.Response, func())) {
+		func(mapId string, mapFn func(*f.Request, *f.Response, func())) {
 			// Clone the res so it can be changed in isolation.
 			response := res.Clone()
 			// Create a buffer.
@@ -94,11 +94,11 @@ func (this Map) Dispatch(req *f.Request, res *f.Response, next func()) map[strin
 			// Add the buffered Locals to the locals map.
 			locals[mapId] = response.Locals
 			// Return the channel
-			c <- 1
+			// c <- 1
 		}(id, fn)
 	}
 	// Wait for all the channels to close.
-	<-c
+	// <-c
 
 	// Put the res.Writer back.
 	res.Response.Writer = w
